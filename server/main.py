@@ -10,25 +10,25 @@ from ml_model.decisiontreeclassifiermodel import predict_playing_golf
 def concat_from_request(outlook, temprature, humidity, windy):
     # return result from client selected request to array
     switcher_outlook = {
-        'outlook_sunny': np.array([0, 0, 1]),
-        'outlook_overcast': np.array([1, 0, 0]),
-        'outlook_rainy': np.array([0, 1, 0])
+        'sunny': np.array([0, 0, 1]),
+        'overcast': np.array([1, 0, 0]),
+        'rainy': np.array([0, 1, 0])
     }
 
     switcher_temprature = {
-        'temprature_cool': np.array([1, 0, 0]),
-        'temprature_hot': np.array([0, 1, 0]),
-        'temprature_mild': np.array([0, 0, 1])
+        'cool': np.array([1, 0, 0]),
+        'hot': np.array([0, 1, 0]),
+        'mild': np.array([0, 0, 1])
     }
 
     switcher_humidity = {
-        'humidity_high': np.array([1, 0]),
-        'humidity_normal': np.array([0, 1])
+        'high': np.array([1, 0]),
+        'normal': np.array([0, 1])
     }
 
     switcher_windy = {
-        'windy_true': np.array([1, 0]),
-        'windy_false': np.array([0, 1])
+        'true': np.array([1, 0]),
+        'false': np.array([0, 1])
     }
 
     # save all selected array to 4 variable outlook, temprature, humidity, windy
@@ -42,15 +42,29 @@ def concat_from_request(outlook, temprature, humidity, windy):
 
     return concatenate
 
+def get_request(request):
+    print('\n------- Get Request From Client -------')
+    print('Outlook : ', request.outlook)
+    print('Temprature : ', request.temprature)
+    print('Humidity : ', request.humidity)
+    print('Windy : ', request.windy)
+    print('---------------------------------------\n')
+
+def set_response(response):
+    print(f'Send Respondse : {response}')
+
 # DataService class to handle client requests
 class DataService(dataservice_pb2_grpc.DataServiceServicer):
     def PredictPlayingGolf(self, request, context):
+        # Show request from client
+        get_request(request)
         # concat from client selected request
         concat = concat_from_request(request.outlook, request.temprature,
                                      request.humidity, request.windy)
         # call predict_paying_method to predict the result from concat variable (concat result is 1D array)
         result = predict_playing_golf(concat)
-
+        # set responde and send to client
+        set_response(result)
         # handle client with outcomes (the prediction)
         return dataservice_pb2.DataServiceRespond(result=result)
 
@@ -58,7 +72,8 @@ class DataService(dataservice_pb2_grpc.DataServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     dataservice_pb2_grpc.add_DataServiceServicer_to_server(DataService(), server)
-    port = server.add_insecure_port('192.168.56.1:5001')
+    # port = server.add_insecure_port('127.0.0.1:5001')
+    port = server.add_insecure_port('192.168.30.1:5001')
     print(f"Port {str(port)} is Ready")
     server.start()
     server.wait_for_termination()

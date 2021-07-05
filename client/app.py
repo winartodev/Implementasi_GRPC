@@ -28,8 +28,9 @@ def weather():
         humidity_value = request.form["humidity"]
         windy_value = request.form["windy"]
 
-        # Connecting to GRPC Server channel in port 127.0.0.1:5001
-        channel = grpc.insecure_channel("192.168.56.1:5001")
+        # Connecting to GRPC Server channel in port 192.168.30.1:5001
+        channel = grpc.insecure_channel("192.168.30.1:5001")
+        # channel = grpc.insecure_channel("127.0.0.1:5001")
         # synchronize  data from server to clinet
         stub = dataservice_pb2_grpc.DataServiceStub(channel)
         # call PredictPlayingGolf with parameter the request from the client
