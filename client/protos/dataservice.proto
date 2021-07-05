@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+service DataService {
+    rpc PredictPlayingGolf(DataServiceRequest) returns (DataServiceRespond);
+}
+
+message DataServiceRequest {
+    string outlook = 1;
+    string temprature = 2;
+    string humidity = 3;
+    string windy = 4; 
+}
+
+message DataServiceRespond {
+    int64 result = 1;
+}
+
+ //python -m grpc_tools.protoc -I protos --python_out=grpc_module --grpc_python_out=grpc_module protos/dataservice.proto
